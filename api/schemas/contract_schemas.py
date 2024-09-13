@@ -105,10 +105,7 @@ class ContractReadCreatedSchema(BaseModel):
 class RoleReadSchema(BaseModel):
     id: int
     name: str
-
-    class Config:
-        from_attributes = True
-        populate_by_name = True
+    role_type: str
 
 
 class UserReadSchema(BaseModel):
@@ -170,3 +167,7 @@ class UserCreateSchema(schemas.BaseUserCreate):
     is_active: Optional[bool] = True
     is_superuser: Optional[bool] = False
     is_verified: Optional[bool] = False
+
+class RoleCreateScheme(BaseModel):
+    name: str
+    role_type: str
