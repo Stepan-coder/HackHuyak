@@ -29,7 +29,7 @@ async def get_me_student(user: User = Depends(fastapi_users.current_user())):
 
 
 @router.post('/roles/create', response_model=RoleReadSchema)
-async def create_role(role: RoleCreateScheme,
+async def create_role(role: RoleCreateSchema,
                       session: AsyncSession = Depends(get_async_session)):
     role_obj = Role(name=role.name, role_type=role.role_type)
 
