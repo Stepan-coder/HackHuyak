@@ -70,6 +70,7 @@ class Node:
             raise ValueError(f"The 'key' should be a string, but got {type(key).__name__}")
         self._edges[key] = to_id
 
+
     def remove_edge(self, key: str) -> None:
         """
         Удаляет ребро из узла по ключу.
