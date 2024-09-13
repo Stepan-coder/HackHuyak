@@ -10,7 +10,7 @@ from admin.admin_global import google, AdminAuth, admin_models
 from settings import config_parameters, is_prod
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
-from starlette.responses import RedirectResponse
+from starlette.responses import RedirectResponse, HTMLResponse
 
 from api.database import engine
 from api.router_global import router
@@ -21,7 +21,7 @@ def create_app() -> FastAPI:
     redoc_url = '/redoc' if not config_parameters.IS_PROD else None
     app = FastAPI(title='Shedevro.API', debug=not config_parameters.IS_PROD,
                   docs_url=docs_url, redoc_url=redoc_url,
-                  root_path='/api')
+                  root_path='/api',)
 
     app.add_middleware(
         CORSMiddleware,

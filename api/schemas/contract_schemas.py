@@ -6,6 +6,7 @@ from fastapi_users import schemas
 from pydantic import BaseModel
 
 
+
 class SpecificationCreateSchema(BaseModel):
     document_name: str
 
@@ -105,7 +106,20 @@ class ContractReadCreatedSchema(BaseModel):
 class RoleReadSchema(BaseModel):
     id: int
     name: str
+
+    class Config:
+        from_attributes = True
+        populate_by_name = True
+
+
+class RoleCreateSchema(BaseModel):
+    name: str
     role_type: str
+
+    class Config:
+        from_attributes = True
+        populate_by_name = True
+
 
 
 class UserReadSchema(BaseModel):
@@ -168,6 +182,4 @@ class UserCreateSchema(schemas.BaseUserCreate):
     is_superuser: Optional[bool] = False
     is_verified: Optional[bool] = False
 
-class RoleCreateScheme(BaseModel):
-    name: str
-    role_type: str
+
