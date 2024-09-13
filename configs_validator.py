@@ -26,6 +26,7 @@ class APIConfigsModel(BaseModel):
     MEDIA_SHORT_URL: Union[str]
     CONTENT_DIR: Union[str]
     CONTENT_SHORT_URL: Union[str]
+    ROOT_DIR: Union[str]
     ANALYZES_DIR: Union[str]
 
 class AuthConfigsModel(BaseModel):
@@ -40,36 +41,16 @@ class GoogleOAUTHConfigsModel(BaseModel):
     OAUTH_CLIENT_EMAILS: Union[str]
 
 
-# class LogsConfigModel(BaseModel):
-#     LOG_FILE: Union[str, None]
-
-#
-# class SMTPConfigsModel(BaseModel):
-#     SMTP_HOSTNAME: Union[str]
-#     SMTP_PORT: Union[int]
-#     SMTP_USERNAME: Union[str]
-#     SMTP_PASSWORD: Union[str]
-#     EMAIL_SENDER: Union[str]
-#
-#
-# class PaymentsConfigsModel(BaseModel):
-#     SECRET_KEY: Union[str]
-#     PRICE: Union[int]
-#     PUBLIC_ID: Union[str]
-#     PRODUCT_NAME: Union[str]
-#
-#
-# class OpenAIConfigModel(BaseModel):
-#     OPENAI_API_KEY: Union[str, None]
-#     ASSISTANT_ID: Union[str, None]
-#
-#
-# class YandexDiskConfigModel(BaseModel):
-#     YADISK_TOKEN: Union[str, None]
-#     YADISK_CL_FILES_DIR: Union[str, None]
+class SMTPConfigsModel(BaseModel):
+    SMTP_HOSTNAME: Union[str]
+    SMTP_PORT: Union[int]
+    SMTP_USERNAME: Union[str]
+    SMTP_PASSWORD: Union[str]
+    EMAIL_SENDER: Union[str]
 
 
 class ConfigsValidator(PostgresDataBaseConfigsModel,
                        MetaConfigsModel, APIConfigsModel,
-                       GoogleOAUTHConfigsModel, AuthConfigsModel):
+                       GoogleOAUTHConfigsModel, AuthConfigsModel,
+                       SMTPConfigsModel):
     pass

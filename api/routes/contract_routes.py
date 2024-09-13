@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.database import get_async_session
 from api.schemas.contract_schemas import *
+from api.services.mailing import send_email_with_file
 from auth_setup import fastapi_users
 
 from models.contract_models import *
@@ -87,6 +88,10 @@ async def get_contract_document(contract_id: int, session: AsyncSession = Depend
         f.write(contract.document_content)
 
     response = FileResponse(temp_file_path, media_type='application/pdf', filename=contract.document_name)
+
+    await send_email_with_file(subject=f'Документ №{contract.number}', recipient='belogurov.ivan@list.ru',
+                               body='Отправка документа с Acmenra!', file=temp_file_path)
+    os.remove(temp_file_path)
 
     return response
 
