@@ -4,13 +4,14 @@ from fastapi.responses import HTMLResponse
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from typer.cli import state
 
 from api.database import get_async_session, database
 from api.schemas.contract_schemas import ChatReadSchema
 from api.utils.chat_helpers import html as ws_html, save_message_history
-from api.utils.fsm import graph
+from api.utils.fsm_new import graph
 
-from api.utils.fsm import first_btn, second_btn
+from api.utils.fsm_new import first_btn, second_btn
 
 from models.contract_models import *
 
@@ -62,39 +63,50 @@ async def agreement_chat(websocket: WebSocket,
                                                      chat, session)
             current_msg_id += 1
 
-            await websocket.send_json(msg_history)
+            # await websocket.send_json(msg_history)
 
             if data == 'доп':
                 break
 
-
-    system_msg = eval(graph.get_node(current_state_id).attachment)
-    await save_message_history(system_msg, current_msg_id, 'system',
+    current_msg_id += 1
+    start_msg = eval(graph.get_node(current_state_id).attachment)
+    await save_message_history(start_msg, current_msg_id, 'system',
                                chat, session)
-    await websocket.send_json(system_msg)
+    await websocket.send_json(start_msg)
 
     while True:
         data = await websocket.receive_text()
 
         if data:
+            if data == 'break':
+                break
+
             state_attachment = eval(current_state.attachment)
 
             if state_attachment['type'] == 'input':
                 agreement[state_attachment['field']] = data
 
+                if 'main_to' in list(state_attachment.keys()):
+                    current_state = graph.get_node(state_attachment['main_to'])
+
+                else:
+                    current_state = graph.get_node(list(graph.predict(current_state.id).values())[0])
+
+
             elif state_attachment['type'] == 'form':
-                current_state_id = data
+                # current_state_id = int(data)
                 current_state = graph.get_node(int(data))
 
             await save_message_history(data, current_msg_id, 'user',
                                                      chat, session)
 
-            system_msg = eval(graph.get_node(current_state_id).attachment)
+            system_msg = eval(current_state.attachment)
             await save_message_history(system_msg, current_msg_id, 'system',
                                        chat, session)
 
             await websocket.send_json(system_msg)
 
+    await websocket.send_json(agreement)
 
 
  # for id in graph.predict(current_state_id).values():

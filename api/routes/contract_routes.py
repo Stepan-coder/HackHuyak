@@ -23,11 +23,11 @@ router = APIRouter(prefix='/contracts',
 # contract: Annotated[ContractCreateScheme, Form()]
 
 @router.post('/create', response_model=ContractReadCreatedSchema)
-async def create_contract(number: str, document_file: UploadFile = File(...), supplier_email: str = None,
-                          customer_email: str = None, session: AsyncSession = Depends(get_async_session),
+async def create_contract(number: str, document_file: UploadFile = File(...), email: str = None,
+                          session: AsyncSession = Depends(get_async_session),
                           user: User = Depends(fastapi_users.current_user())):
     if document_file.content_type != 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-        raise HTTPException(status_code=400, detail='Документ должен быть в формате PDF!')
+        raise HTTPException(status_code=400, detail='Документ должен быть в формате DOCX!')
 
     file_location = os.path.join(config_parameters.CONTRACTS_DIR, document_file.filename)
 
@@ -41,13 +41,13 @@ async def create_contract(number: str, document_file: UploadFile = File(...), su
     if user.role.role_type == 'customer':
         customer_id = user.id
 
-        supplier_query = await session.execute(select(User).filter(User.email == supplier_email))
+        supplier_query = await session.execute(select(User).filter(User.email == email))
         supplier_id = supplier_query.scalars().first().id
 
     elif user.role.role_type == 'supplier':
         supplier_id = user.id
 
-        customer_query = await session.execute(select(User).filter(User.email == customer_email))
+        customer_query = await session.execute(select(User).filter(User.email == email))
         customer_id = customer_query.scalars().first().id
 
     contract_obj = Contract(number=number, supplier_id=supplier_id,

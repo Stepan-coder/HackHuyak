@@ -6,11 +6,12 @@ from models.contract_models import User
 from settings import config_parameters
 
 
-cookie_transport = CookieTransport(cookie_name=config_parameters.AUTH_COOKIE_NAME, cookie_max_age=3600)
+cookie_transport = CookieTransport(cookie_name=config_parameters.AUTH_COOKIE_NAME, cookie_max_age=3600 * 5,
+                                   cookie_secure=False, cookie_samesite='none')
 
 
 def get_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=config_parameters.AUTH_SECRET, lifetime_seconds=3600)
+    return JWTStrategy(secret=config_parameters.AUTH_SECRET, lifetime_seconds=3600,)
 
 
 auth_backend = AuthenticationBackend(

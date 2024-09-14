@@ -39,10 +39,29 @@ html = """
 async def save_message_history(data, current_msg_id, from_who,
                                chat, session):
     if data:
-        current_msg = {'id': current_msg_id,
-                       'from': from_who,
-                       'text': data,
-                       'created_datetime': f'{datetime.now()}'}
+        current_msg = None
+
+        if type(data) == dict:
+           if data['type'] == 'form':
+               current_msg = {'id': current_msg_id,
+                              'from': from_who,
+                              'text': data['text'],
+                              'buttons': data['buttons'],
+                              'type': 'form',
+                              'created_datetime': f'{datetime.now()}'}
+
+           else:
+               current_msg = {'id': current_msg_id,
+                              'from': from_who,
+                              'text': data['text'],
+                              'placeholder': data['placeholder'],
+                              'type': 'input',
+                              'created_datetime': f'{datetime.now()}'}
+
+
+        elif type(data) == str:
+            current_msg = {'id': current_msg_id, 'from': from_who, 'text': data,
+                           'type': 'input', 'created_datetime': f'{datetime.now()}'}
 
         if len(chat.messages_history):
             new_hist = list(chat.messages_history)
