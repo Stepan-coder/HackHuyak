@@ -50,7 +50,6 @@ async def create_contract(number: str, document_file: UploadFile = File(...), su
         customer_query = await session.execute(select(User).filter(User.email == customer_email))
         customer_id = customer_query.scalars().first().id
 
-    # file_content = await document_file.read()
     contract_obj = Contract(number=number, supplier_id=supplier_id,
                             customer_id=customer_id, document_file=document_file.filename,
                             creator_id=user.id)

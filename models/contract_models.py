@@ -2,9 +2,11 @@ from datetime import datetime, date
 from typing import Optional, List
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
+from pygments.lexer import default
 
+from sqlalchemy import event
 from api.database import Base
-from sqlalchemy.orm import relationship, Mapped
+from sqlalchemy.orm import relationship, Mapped, Session
 from sqlalchemy import (Column, Integer, String, TIMESTAMP, ForeignKey, DATE,
                         Boolean, Text, DATE, Table, JSON, LargeBinary)
 
@@ -32,6 +34,9 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     reg_date: Mapped[date] = Column(DATE, default=datetime.now)
     reg_authority: Mapped[str] = Column(Text, nullable=False)
     loc_address: Mapped[str] = Column(Text, nullable=False)
+
+    # chat: Mapped[Optional['Chat']] = relationship('Chat', back_populates='user',
+    #                                               uselist=False)
 
     registered_at: Mapped[datetime] = Column(TIMESTAMP, default=datetime.utcnow)
 
@@ -90,11 +95,12 @@ class Agreement(Base):
     specification: Mapped[Optional['Specification']] = relationship('Specification',
                                                                     back_populates='agreement', lazy='selectin')
 
+    chat_id: Mapped[int] = Column(Integer, ForeignKey('chat.id'), nullable=True)
+    chat: Mapped[Optional['Chat']] = relationship('Chat', back_populates='agreements',
+                                                          lazy='selectin')
+
     document_name: Mapped[str] = Column(String, nullable=False)
     document_content = Column(LargeBinary, nullable=False)
-
-    messages_history: Mapped[List[dict]] = Column(JSON, nullable=True)
-    states_history: Mapped[List[dict]] = Column(JSON, nullable=True)
 
     created: Mapped[bool] = Column(Boolean, default=False)
     created_date: Mapped[datetime] = Column(DATE, default=datetime.now)
@@ -119,3 +125,30 @@ class Specification(Base):
 
     def __str__(self):
         return self.id
+
+
+class Chat(Base):
+    __tablename__ = 'chat'
+
+    id: Mapped[int] = Column(Integer, primary_key=True)
+
+    messages_history: Mapped[List[dict]] = Column(JSON, default={}, nullable=True)
+    states_history: Mapped[List[dict]] = Column(JSON, default={}, nullable=True)
+
+    user_id: Mapped[int] = Column(Integer, ForeignKey('user.id'), nullable=True)
+    user: Mapped[Optional['User']] = relationship('User', uselist=False)
+
+    agreements: Mapped[Optional[List['Agreement']]] = relationship('Agreement',
+                                                                   back_populates='chat', lazy='selectin')
+
+    def __str__(self):
+        return self.id
+
+
+@event.listens_for(User, 'after_insert')
+def create_chat(mapper, connection, target: User):
+    session: Session = Session(bind=connection)
+    new_chat = Chat(user_id=target.id)
+
+    session.add(new_chat)
+    session.commit()

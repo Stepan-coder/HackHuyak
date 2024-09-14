@@ -31,9 +31,6 @@ class AgreementReadDetailSchema(BaseModel):
     specification_id: int
     specification: Optional['SpecificationReadSchema'] = None
 
-    messages_history: list[dict]
-    states_history: list[dict]
-
     document_name: str
 
     created: bool
@@ -181,5 +178,17 @@ class UserCreateSchema(schemas.BaseUserCreate):
     is_active: Optional[bool] = True
     is_superuser: Optional[bool] = False
     is_verified: Optional[bool] = False
+
+
+
+class ChatReadSchema(BaseModel):
+    messages_history: Optional[list[dict]] = None
+    states_history: Optional[list[dict]] = None
+
+    agreements: Optional[List['AgreementReadSchema']]
+
+    class Config:
+        from_attributes = True
+        populate_by_name = True
 
 

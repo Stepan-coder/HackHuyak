@@ -1,5 +1,6 @@
 from admin.models.user_admin import *
 from admin.models.contract_admin import *
+from admin.models.chat_admin import *
 from typing import Union
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
@@ -26,4 +27,5 @@ class AdminAuth(AuthenticationBackend):
         return True
 
 
-admin_models = [RoleAdmin, UserAdmin, SpecificationAdmin, ContractAdmin, AgreementAdmin]
+admin_models = [RoleAdmin, UserAdmin, SpecificationAdmin, ContractAdmin, AgreementAdmin,
+                ChatAdmin]

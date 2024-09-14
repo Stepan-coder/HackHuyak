@@ -1,146 +1,102 @@
-import os
-import json
-
-from typing import List, Annotated
-from datetime import datetime
-
-from fastapi import status, APIRouter, WebSocket
+from fastapi import APIRouter, WebSocket
 from fastapi.params import Depends
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import HTMLResponse
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.database import get_async_session
+from api.database import get_async_session, database
+from api.schemas.contract_schemas import ChatReadSchema
+from api.utils.chat_helpers import html as ws_html, save_message_history
 from api.utils.fsm import graph
-from auth_setup import fastapi_users
+
+from api.utils.fsm import first_btn, second_btn
 
 from models.contract_models import *
-from settings import config_parameters
+
 
 router = APIRouter(prefix='/agreements',
                    tags=['Agreements'])
 
 
-
-html = """
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Chat</title>
-    </head>
-    <body>
-        <h1>WebSocket Chat</h1>
-        <form action="" onsubmit="sendMessage(event)">
-            <input type="text" id="messageText" autocomplete="off"/>
-            <button>Send</button>
-        </form>
-        <ul id='messages'>
-        </ul>
-        <script>
-            var ws = new WebSocket("ws://localhost:8000/api/agreements/chat");
-            ws.onmessage = function(event) {
-                var messages = document.getElementById('messages')
-                var message = document.createElement('li')
-                var content = document.createTextNode(event.data)
-                message.appendChild(content)
-                messages.appendChild(message)
-            };
-            function sendMessage(event) {
-                var input = document.getElementById("messageText")
-                ws.send(input.value)
-                input.value = ''
-                event.preventDefault()
-            }
-        </script>
-    </body>
-</html>
-"""
-
-
 @router.get('/')
 async def get_chat():
-    return HTMLResponse(html)
+    return HTMLResponse(ws_html)
+
+
+@router.post('/chat/create', response_model=ChatReadSchema)
+async def create_chat(session: AsyncSession = Depends(get_async_session)):
+    chat_obj = Chat()
+
+    session.add(chat_obj)
+    await session.commit()
+
+    return chat_obj
 
 
 @router.websocket('/chat')
-async def agreement_chat(websocket: WebSocket):
+async def agreement_chat(websocket: WebSocket,
+                         session: AsyncSession = Depends(get_async_session)):
     await websocket.accept()
 
-    messages_history = []
+    chat_query = await session.execute(select(Chat).filter(Chat.id == 1))
+    chat = chat_query.scalars().first()
+
+    agreement = {}
+
     current_msg_id = 1
+    current_state_id = 1
+    current_state = graph.get_node(current_state_id)
+
+    if chat.messages_history != {}:
+        if len(chat.messages_history):
+            current_msg_id = chat.messages_history[-1]['id'] + 1
+
+            await websocket.send_json(chat.messages_history)
 
     while True:
         data = await websocket.receive_text()
 
-        if data != '' or data != None:
-            messages_history.append({'id': current_msg_id,
-                                     'from': 'user',
-                                     'text': data,
-                                     'created_datetime': datetime.now()})
-
-            await websocket.send_json(f'Ответ на сообщение {current_msg_id} - {data}')
-
+        if data:
+            msg_history = await save_message_history(data, current_msg_id, 'user',
+                                                     chat, session)
             current_msg_id += 1
 
+            await websocket.send_json(msg_history)
 
-# @router.websocket('/chat')
-# async def agreement_chat(websocket: WebSocket,
-#                              session: AsyncSession = Depends(get_async_session),
-#                              user: User = Depends(fastapi_users.current_user())):
-#     await websocket.accept()
-#
-#     agreement_new = {}
-#     messages_history = []
-#     states_history = []
-#
-#     current_msg_id = 1
-#     current_state = None
-#     states_json = None
-#
-#     with open(f'{config_parameters.ROOT_DIR}fsm_attachments.json', 'r') as fsm_json:
-#          states_json = json.load(json.load(fsm_json))
-#
-#     while True:
-#         data = await websocket.receive_text()
-#
-#         if data != '' or data != None:
-#             if data == 'доп соглашение':
-#                 messages_history.append({'id': current_msg_id,
-#                                          'from': 'user',
-#                                          'text': data,
-#                                          'created_datetime': datetime.now()})
-#
-#                 for id in graph.predict(1).values():
-#                     for state in states_json:
-#                         if state['id'] == id:
-#                             current_state = state
-#
-#                             break
-#                     break
-#
-#                 current_msg_id += 1
-#                 system_message = {'id': current_msg_id,
-#                                   'from': 'system',
-#                                   'text': current_state['attachment'],
-#                                   'created_datetime': datetime.now()}
-#
-#                 await websocket.send_json(system_message)
-#                 break
-#
-#     while True:
-#         data = await websocket.receive_text()
-#
-#         if data != '' and data:
-#             if data == 'break':
-#                 break
-#
-#             if current_state['type'] == 'input':
-#                 messages_history.append({'id': current_msg_id,
-#                                          'from': 'user',
-#                                          'text': data,
-#                                          'created_datetime': datetime.now()})
-#
-#                 agreement_new[current_state['field']] = data
-#
-#         await websocket.send_text(f"Message text was: {data}")
+            if data == 'доп':
+                break
+
+
+    system_msg = eval(graph.get_node(current_state_id).attachment)
+    await save_message_history(system_msg, current_msg_id, 'system',
+                               chat, session)
+    await websocket.send_json(system_msg)
+
+    while True:
+        data = await websocket.receive_text()
+
+        if data:
+            state_attachment = eval(current_state.attachment)
+
+            if state_attachment['type'] == 'input':
+                agreement[state_attachment['field']] = data
+
+            elif state_attachment['type'] == 'form':
+                current_state_id = data
+                current_state = graph.get_node(int(data))
+
+            await save_message_history(data, current_msg_id, 'user',
+                                                     chat, session)
+
+            system_msg = eval(graph.get_node(current_state_id).attachment)
+            await save_message_history(system_msg, current_msg_id, 'system',
+                                       chat, session)
+
+            await websocket.send_json(system_msg)
+
+
+
+ # for id in graph.predict(current_state_id).values():
+            #     if graph.get_node(id).attachment:
+            #         attachments.append(ast.literal_eval(graph.get_node(id).attachment))

@@ -29,7 +29,6 @@ def create_app() -> FastAPI:
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
-        expose_headers=["*"],
     )
     app.add_middleware(SessionMiddleware, secret_key=config_parameters.SECRET_KEY)
     app.mount('/static', StaticFiles(directory=config_parameters.STATIC_DIR), name='static')

@@ -31,7 +31,6 @@ async def send_email(subject: str, recipient: str, body: str):
             use_tls=False,
             start_tls=True
         )
-        print(a)
 
         return True
 
