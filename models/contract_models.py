@@ -56,8 +56,8 @@ class Contract(Base):
     number: Mapped[str] = Column(String, unique=True)
     from_date: Mapped[date] = Column(DATE, default=datetime.now)
 
-    document_name: Mapped[str] = Column(String, nullable=False)
-    document_content = Column(LargeBinary, nullable=False)
+    document_file: Mapped[str] = Column(String, nullable=True)
+    # document_content = Column(LargeBinary, nullable=False)
 
     customer_id: Mapped[int] = Column(Integer, ForeignKey('user.id'), nullable=True)
     customer: Mapped[Optional['User']] = relationship('User', foreign_keys='[Contract.customer_id]',

@@ -79,7 +79,7 @@ class ContractReadSchema(BaseModel):
     customer_id: int
     customer: Optional['UserReadSchema'] = None
 
-    document_name: str
+    document_file: str
 
     supplier_id: int
     supplier: Optional['UserReadSchema'] = None
@@ -96,7 +96,7 @@ class ContractReadSchema(BaseModel):
 class ContractReadCreatedSchema(BaseModel):
     id: int
     number: str
-    document_name: str
+    document_file: str
 
     class Config:
         from_attributes = True

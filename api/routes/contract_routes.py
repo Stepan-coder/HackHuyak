@@ -26,8 +26,14 @@ router = APIRouter(prefix='/contracts',
 async def create_contract(number: str, document_file: UploadFile = File(...), supplier_email: str = None,
                           customer_email: str = None, session: AsyncSession = Depends(get_async_session),
                           user: User = Depends(fastapi_users.current_user())):
-    if document_file.content_type != 'application/pdf':
+    if document_file.content_type != 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
         raise HTTPException(status_code=400, detail='Документ должен быть в формате PDF!')
+
+    file_location = os.path.join(config_parameters.CONTRACTS_DIR, document_file.filename)
+
+    with open(file_location, "wb") as f:
+        contents = await document_file.read()
+        f.write(contents)
 
     customer_id = None
     supplier_id = None
@@ -44,9 +50,9 @@ async def create_contract(number: str, document_file: UploadFile = File(...), su
         customer_query = await session.execute(select(User).filter(User.email == customer_email))
         customer_id = customer_query.scalars().first().id
 
-    file_content = await document_file.read()
+    # file_content = await document_file.read()
     contract_obj = Contract(number=number, supplier_id=supplier_id,
-                            customer_id=customer_id, document_content=file_content, document_name=document_file.filename,
+                            customer_id=customer_id, document_file=document_file.filename,
                             creator_id=user.id)
 
     session.add(contract_obj)
@@ -82,16 +88,11 @@ async def get_contract_document(contract_id: int, session: AsyncSession = Depend
     if contract is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Договор не найден!')
 
-    temp_file_path = f'{config_parameters.STATIC_DIR}temp_{contract.document_name}'
-
-    with open(temp_file_path, 'wb') as f:
-        f.write(contract.document_content)
-
-    response = FileResponse(temp_file_path, media_type='application/pdf', filename=contract.document_name)
+    document_path = f'{config_parameters.CONTRACTS_DIR}/{contract.document_file}'
+    response = FileResponse(document_path, filename=contract.document_file)
 
     await send_email_with_file(subject=f'Документ №{contract.number}', recipient='belogurov.ivan@list.ru',
-                               body='Отправка документа с Acmenra!', file=temp_file_path)
-    os.remove(temp_file_path)
+                               body='Отправка документа с Acmenra!', file=document_path)
 
     return response
 

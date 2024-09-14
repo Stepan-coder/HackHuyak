@@ -28,6 +28,7 @@ class APIConfigsModel(BaseModel):
     CONTENT_SHORT_URL: Union[str]
     ROOT_DIR: Union[str]
     ANALYZES_DIR: Union[str]
+    CONTRACTS_DIR: Union[str]
 
 class AuthConfigsModel(BaseModel):
     AUTH_SECRET: Union[str]
