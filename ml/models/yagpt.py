@@ -57,9 +57,9 @@ class YaGPT:
         return text
 
 
-# yagpt = YaGPT(catalog_id='b1gaa0i749eqe9ogone8', api_key='AQVN2yvuhm5p2BeZDjf-wj-k0qC1sHRVoZUYM_r3')
-# yagpt.set_context(context='Ты инвестор c многолетним стажем')
-# answer = yagpt.get_GPT_answer(query="Ответь только да или нет, без дополнительного текста, инвестирует ли этот инвестор в it проекты на основе этого описания: Приоритетными являются уже созданные компании, существующие на рынке более года с потребностью привлечения средств для дальнейшего роста и развития. Также интересуют проекты, создаваемые руководителями компаний, желающих перейти из категории наемных сотрудников в собственный бизнес с долевым участием. Рассматриваем проекты с объемом привлечения средств от 1 500 000 до 30 000 000 рублей.")
-#
-# print(answer)
+yagpt = YaGPT(catalog_id='b1gaa0i749eqe9ogone8', api_key='AQVN2yvuhm5p2BeZDjf-wj-k0qC1sHRVoZUYM_r3')
+yagpt.set_context(context='Ты эксперт по тендерам')
+answer = yagpt.get_GPT_answer(query="Расскажи о 44-фз")
+
+print(answer)
 # print(role, text)
