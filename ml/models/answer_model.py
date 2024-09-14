@@ -40,6 +40,7 @@ class AnswerModel:
         return self._model(question=question, context=context)['answer']
 
 
+<<<<<<< Updated upstream
 context = """
 Юридический адрес: 121087, г. Москва,
 ул. Тучковская, д.9, корп. 2;
@@ -72,3 +73,7 @@ answer_model = AnswerModel()
 answer = answer_model.predict(question='Юридический адрес',
                               context=context)
 print(answer)
+=======
+
+
+>>>>>>> Stashed changes
