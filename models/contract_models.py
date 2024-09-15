@@ -76,6 +76,8 @@ class Contract(Base):
     creator: Mapped[Optional['User']] = relationship('User', foreign_keys='[Contract.creator_id]',
                                                      lazy='selectin')
 
+    contract_content: Mapped[List[dict]] = Column(JSON, default={}, nullable=True)
+
     agreements: Mapped[Optional[List['Agreement']]] = relationship('Agreement',
                                                                           back_populates='contract', lazy='selectin')
 
@@ -152,3 +154,97 @@ def create_chat(mapper, connection, target: User):
 
     session.add(new_chat)
     session.commit()
+
+    # @router.websocket('/chat')
+    # async def agreement_chat(websocket: WebSocket, user_id: int = None, session: AsyncSession = Depends(get_async_session),):
+    #     await websocket.accept()
+    #
+    #     user_query = await session.execute(select(User).filter(User.id == user_id))
+    #     user = user_query.scalars().first()
+    #
+    #     chat_query = await session.execute(select(Chat).filter(Chat.user_id == user.id))
+    #     chat = chat_query.scalars().first()
+    #
+    #     contract_new = {}
+    #
+    #     current_msg_id = 1
+    #     current_state = graph.get_node(1)
+    #
+    #     if chat.messages_history != {}:
+    #         if len(chat.messages_history):
+    #             current_msg_id = chat.messages_history[-1]['id'] + 1
+    #
+    #             await websocket.send_json(chat.messages_history)
+    #
+    #     while True:
+    #         data = await websocket.receive_text()
+    #
+    #         if data:
+    #             msg_history = await save_message_history(data, current_msg_id, 'user',
+    #                                                      chat, session)
+    #             current_msg_id += 1
+    #
+    #             if data == 'доп':
+    #                 break
+    #
+    #     current_msg_id += 1
+    #     start_msg = eval(graph.get_node(1).attachment)
+    #     await save_message_history(start_msg, current_msg_id, 'system',
+    #                                chat, session)
+    #     await websocket.send_json(start_msg)
+    #
+    #     contract = None
+    #
+    #     while True:
+    #         data = await websocket.receive_text()
+    #
+    #         if data:
+    #             state_attachment = eval(current_state.attachment)
+    #
+    #             if state_attachment['type'] == 'input':
+    #                 if state_attachment['field'] == 'contract_number':
+    #                     contract_query = await session.execute(select(Contract).filter(Contract.number == data and Contract.creator.id == user.id))
+    #                     contracts = contract_query.scalars()
+    #
+    #                     if len(contracts.all()) == 0:
+    #                         await websocket.send_json(state_attachment)
+    #                         continue
+    #
+    #                     else:
+    #                         contract = contracts.first()
+    #
+    #                 contract_new[state_attachment['field']] = data
+    #
+    #                 if 'main_to' in list(state_attachment.keys()):
+    #                     current_state = graph.get_node(state_attachment['main_to'])
+    #
+    #                 else:
+    #                     current_state = graph.get_node(list(graph.predict(current_state.id).values())[0])
+    #
+    #             elif state_attachment['type'] == 'form':
+    #                 current_state = graph.get_node(int(data))
+    #
+    #                 if eval(current_state.attachment)['type'] == 'save':
+    #                     new_contract_content = contract.contract_content
+    #
+    #                     for key, value in contract_new:
+    #                         new_contract_content[key] = value
+    #
+    #                     contract.contract_content = new_contract_content
+    #                     session.add(contract)
+    #
+    #                     await session.commit()
+    #                     await session.refresh(contract_new)
+    #
+    #                     break
+    #
+    #             await save_message_history(data, current_msg_id, 'user',
+    #                                                      chat, session)
+    #
+    #             system_msg = eval(current_state.attachment)
+    #             await save_message_history(system_msg, current_msg_id, 'system',
+    #                                        chat, session)
+    #
+    #             await websocket.send_json(system_msg)
+    #
+    #     await websocket.send_json(contract_new)

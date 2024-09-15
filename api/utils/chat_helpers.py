@@ -16,7 +16,7 @@ html = """
         <ul id='messages'>
         </ul>
         <script>
-            var ws = new WebSocket("ws://localhost:8000/api/agreements/chat");
+            var ws = new WebSocket("ws://localhost:8000/api/agreements/chat?user_id=2");
             ws.onmessage = function(event) {
                 var messages = document.getElementById('messages')
                 var message = document.createElement('li')
@@ -46,6 +46,14 @@ async def save_message_history(data, current_msg_id, from_who,
                current_msg = {'id': current_msg_id,
                               'from': from_who,
                               'text': data['text'],
+                              'buttons': data['buttons'],
+                              'type': 'form',
+                              'created_datetime': f'{datetime.now()}'}
+
+           elif data['type'] == 'save':
+               current_msg = {'id': current_msg_id,
+                              'from': from_who,
+                              'text': data['type'],
                               'buttons': data['buttons'],
                               'type': 'form',
                               'created_datetime': f'{datetime.now()}'}

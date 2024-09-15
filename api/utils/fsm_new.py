@@ -32,7 +32,7 @@ graph.add_node(Node(id=3, attachment="""{'text': 'Выберите действ�
                                       'buttons': [
                                           {'to': 4, 'text': 'Изменить пункты договора', 'color': first_btn},
                                           {'to': 14, 'text': 'Изменить реквизиты договора', 'color': first_btn},
-                                          {'to': 2, 'text': 'Назад', 'color': second_btn}
+                                          {'to': 38, 'text': 'Завершить редактирование договора', 'color': first_btn}
                                       ], 'type': 'form'}"""))
 
 graph.add_node(Node(id=4, attachment="""{'text': 'Выберите действия с пунктами договора:',
@@ -134,6 +134,15 @@ for i, field, name in zip(range(27, 37), list(details.keys()), list(details.valu
                                            'field': f'supplier_{field}', 'placeholder': f'Введите {name} поставщика',
                                            'main_to': 16}
     graph.add_node(Node(id=i, attachment=f"""{attachment}"""))
+
+
+graph.add_node(Node(id=37, attachment="""{'text': 'Это всё что вы хотели отредактировать?',
+                                       'buttons': [
+                                           {'to': 38, 'text': 'Да', 'color': first_btn},
+                                           {'to': 3, 'text': 'Нет', 'color': second_btn}
+                                       ], 'type': 'form'}"""))
+
+graph.add_node(Node(id=38, attachment="""{'type': 'save'}"""))
 
 # Старт
 

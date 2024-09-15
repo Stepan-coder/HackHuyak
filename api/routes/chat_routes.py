@@ -1,3 +1,5 @@
+from distutils.ccompiler import new_compiler
+
 from fastapi import APIRouter, WebSocket
 from fastapi.params import Depends
 from fastapi.responses import HTMLResponse
@@ -12,6 +14,7 @@ from api.utils.chat_helpers import html as ws_html, save_message_history
 from api.utils.fsm_new import graph
 
 from api.utils.fsm_new import first_btn, second_btn
+from auth_setup import fastapi_users
 
 from models.contract_models import *
 
@@ -36,18 +39,19 @@ async def create_chat(session: AsyncSession = Depends(get_async_session)):
 
 
 @router.websocket('/chat')
-async def agreement_chat(websocket: WebSocket,
-                         session: AsyncSession = Depends(get_async_session)):
+async def agreement_chat(websocket: WebSocket, user_id: int = None, session: AsyncSession = Depends(get_async_session),):
     await websocket.accept()
 
-    chat_query = await session.execute(select(Chat).filter(Chat.id == 1))
+    user_query = await session.execute(select(User).filter(User.id == user_id))
+    user = user_query.scalars().first()
+
+    chat_query = await session.execute(select(Chat).filter(Chat.user_id == user.id))
     chat = chat_query.scalars().first()
 
-    agreement = {}
+    contract_new = {}
 
     current_msg_id = 1
-    current_state_id = 1
-    current_state = graph.get_node(current_state_id)
+    current_state = graph.get_node(1)
 
     if chat.messages_history != {}:
         if len(chat.messages_history):
@@ -63,28 +67,36 @@ async def agreement_chat(websocket: WebSocket,
                                                      chat, session)
             current_msg_id += 1
 
-            # await websocket.send_json(msg_history)
-
             if data == 'доп':
                 break
 
     current_msg_id += 1
-    start_msg = eval(graph.get_node(current_state_id).attachment)
+    start_msg = eval(graph.get_node(1).attachment)
     await save_message_history(start_msg, current_msg_id, 'system',
                                chat, session)
     await websocket.send_json(start_msg)
+
+    contract = None
 
     while True:
         data = await websocket.receive_text()
 
         if data:
-            if data == 'break':
-                break
-
             state_attachment = eval(current_state.attachment)
 
             if state_attachment['type'] == 'input':
-                agreement[state_attachment['field']] = data
+                if state_attachment['field'] == 'contract_number':
+                    contract_query = await session.execute(select(Contract).filter(Contract.number == data))
+                    contracts = contract_query.scalars()
+
+                    if len(contracts.all()) == 0:
+                        await websocket.send_json(state_attachment)
+                        continue
+
+                    else:
+                        contract = contracts.first()
+
+                contract_new[state_attachment['field']] = data
 
                 if 'main_to' in list(state_attachment.keys()):
                     current_state = graph.get_node(state_attachment['main_to'])
@@ -92,10 +104,17 @@ async def agreement_chat(websocket: WebSocket,
                 else:
                     current_state = graph.get_node(list(graph.predict(current_state.id).values())[0])
 
-
             elif state_attachment['type'] == 'form':
-                # current_state_id = int(data)
                 current_state = graph.get_node(int(data))
+
+                if eval(current_state.attachment)['type'] == 'save':
+                    # contract.contract_content = contract_new
+                    # session.add(contract)
+                    #
+                    # await session.commit()
+                    # await session.refresh(contract)
+
+                    break
 
             await save_message_history(data, current_msg_id, 'user',
                                                      chat, session)
@@ -106,9 +125,4 @@ async def agreement_chat(websocket: WebSocket,
 
             await websocket.send_json(system_msg)
 
-    await websocket.send_json(agreement)
-
-
- # for id in graph.predict(current_state_id).values():
-            #     if graph.get_node(id).attachment:
-            #         attachments.append(ast.literal_eval(graph.get_node(id).attachment))
+    await websocket.send_json(contract_new)
