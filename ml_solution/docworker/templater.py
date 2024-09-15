@@ -39,19 +39,19 @@ class DocumentGenerator:
             raise FileNotFoundError(f"Directory not found: {output_dir}")
 
         texts = []
-        if context['detail_paragraph'] != '' and context['detail_paragraph'] != '':
+        if context['detail_paragraph'] != '' and context['detail_text'] != '':
             texts.append(f"Стороны пришли к взаимному согласию об изложении пункта {context['detail_paragraph']} "
-                         f"в следующей редакции: {context['detail_paragraph']}.\n")
+                         f"в следующей редакции: {context['detail_text']}.\n")
 
         if context['except_paragraph'] != '':
             texts.append(f"Стороны пришли к взаимному согласию об исключении пункта {context['except_paragraph']} из Договора.\n")
 
         if context['additional_paragraph'] != '' and context['additional_text'] != '':
             texts.append(f"Стороны пришли к взаимному согласию о добавлении пункта {context['additional_paragraph']} в "
-                         f"Договор в следующей редакции: {context['additional_text']}")
+                         f"Договор в следующей редакции: {context['additional_text']}\n")
 
-        texts.append("Во всем остальном, что не предусмотрено настоящим Соглашением, Стороны руководствуются условиями Договора и дополнительными соглашениями к нему.")
-        texts.append("Настоящее Соглашение составлено в двух экземплярах, имеющих одинаковую юридическую силу, по одному экземпляру для каждой Стороны.")
+        texts.append("Во всем остальном, что не предусмотрено настоящим Соглашением, Стороны руководствуются условиями Договора и дополнительными соглашениями к нему.\n")
+        texts.append("Настоящее Соглашение составлено в двух экземплярах, имеющих одинаковую юридическую силу, по одному экземпляру для каждой Стороны.\n")
 
         buidet_text = ""
         for i, text in enumerate(texts):
@@ -62,26 +62,35 @@ class DocumentGenerator:
         self.template.render(context)
         self.template.save(output_path)
 
-# # # Протокол разногласий (ОСНОВНОЕ)
+# # Протокол разногласий (ОСНОВНОЕ)
 # context = {
-#     'additional_agreement_number': '1',
-#     'contract_number': 'номердоговора',
+#     'additional_agreement_number': 'dcs',
+#     'contract_number': ' ',
 #     'contract_date': '35 февраля 2024',
-#     'contract_city': 'Усть-залупинск',
-#     'customer_company_fullname': 'ООО "Залупки"',
+#     'contract_city': ' ',
+#     'customer_company_fullname': ' ',
 #
-#     'customer_FIO': 'Заказчиков Заказчик Заказчикович',
-#     'by_statment': 'Устава',
+#     'contract_summ': '',
 #
-#     'executor_company_fullname': 'ИП "Усть"',
-#     'executor_FIO': 'Полнителевич Исполнитель Исполнительевич',
+#     'customer_FIO': '',
+#     'by_statment': ' ',
+#
+#     'executor_company_fullname': '',
+#     'executor_FIO': '',
+#
+#     'detail_paragraph': '23',
+#     'detail_text': 'Оно нам нахуй не нужен',
+#     'except_paragraph': '',
+#     'additional_paragraph': '',
+#     'additional_text': '',
+#     'metadata': '',
 #
 #     'customer_company_index': '66666',
 #     'customer_company_adress': 'Усть залупинск',
 #     'customer_copany_INN': '3485734958732',
 #     'customer_company_KPP': '109823457039480934',
 #     'customer_company_OGRN': '2424234234234515',
-#     'customer_bank': 'Конча-банк',
+#     'customer_bank': '',
 #     'customer_payment_account': '98759378246509384570319487503',
 #     'customer_correspondent_account': '99829342412313123',
 #     'customer_BIC': '1023472134',
@@ -91,12 +100,14 @@ class DocumentGenerator:
 #     'executor_company_INN': '10039480934',
 #     'executor_company_KPP': '89586596598',
 #     'executor_company_OGRN': '0871234987552135',
+#     'executor_bank': 'Конча-банк',
 #     'executor_payment_account': '0193485603948573091458734',
 #     'executor_correspondent_account': '098324576094756324',
 #     'executor_BIC': '2903587214',
 # }
+#
 # doc_gen = DocumentGenerator("templates/Дополнительное_соглашение_к_договору_поставки (Шаблон).docx")
-# doc_gen.generate_document(context, "Допсоглашение.docx")
+# doc_gen.generate_document(context, "Допсоглашение++.docx")
 
 # # Протокол разногласий
 # context = {

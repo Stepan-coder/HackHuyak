@@ -47,7 +47,6 @@ context = {
     'executor_company_fullname': '',
     'executor_FIO': '',
 
-
     'detail_paragraph': '',
     'detail_text': '',
     'except_paragraph': '',
