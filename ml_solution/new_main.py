@@ -39,6 +39,8 @@ context = {
     'contract_city': ' ',
     'customer_company_fullname': ' ',
 
+    'contract_summ': '',
+
     'customer_FIO': '',
     'by_statment':  ' ',
 
@@ -50,7 +52,7 @@ context = {
     'customer_copany_INN': '3485734958732',
     'customer_company_KPP': '109823457039480934',
     'customer_company_OGRN': '2424234234234515',
-    'customer_bank': 'Конча-банк',
+    'customer_bank': '',
     'customer_payment_account': '98759378246509384570319487503',
     'customer_correspondent_account': '99829342412313123',
     'customer_BIC': '1023472134',
@@ -66,22 +68,25 @@ context = {
     'executor_BIC': '2903587214',
 }
 
-# Тут напрямую задаем вопросы нейронке
-context['additional_agreement_number'] = get_answer(question="Номер соглашения", documents=paragraphs)
-context['contract_number'] = get_answer(question="Номер договора", documents=paragraphs)
-context['contract_city'] = get_answer(question="В каком городе", documents=paragraphs)
-# context['customer_company_fullname'] = get_answer(question="Полное название компании заказчика", documents=paragraphs)
-context['by_statment'] = get_answer(question="На основании", documents=paragraphs)
-# context['executor_company_fullname'] = get_answer(question="Полное название компании исполнителя", documents=paragraphs)
+# # Тут напрямую задаем вопросы нейронке
+# context['additional_agreement_number'] = get_answer(question="Номер соглашения", documents=paragraphs)
+# context['contract_number'] = get_answer(question="Номер договора", documents=paragraphs)
+# context['contract_city'] = get_answer(question="В каком городе", documents=paragraphs)
+# # context['customer_company_fullname'] = get_answer(question="Полное название компании заказчика", documents=paragraphs)
+# context['by_statment'] = get_answer(question="На основании", documents=paragraphs)
+# # context['executor_company_fullname'] = get_answer(question="Полное название компании исполнителя", documents=paragraphs)
 
 # Переменная для хранения списка име (у нас всего 2 стороны, причем, сперва пишется заказчик, а потом исполнитель)
 names = []
-
+money = []
 # Вызываем 'разметчик", проверяем, что имя, фамилия и отчества присутствуют одновременно. Добавляем в список имен
 for mrkp in text_mark_up.get_markup(text=" ".join(paragraphs)):
     if mrkp.block_type == MarkUpType.PERSON and mrkp.attachments["First"] is not None \
             and mrkp.attachments["Last"] is not None and mrkp.attachments["Middle"] is not None:
             names.append(f"{mrkp.attachments['Last']} {mrkp.attachments['First']} {mrkp.attachments['Middle']}")
+    if mrkp.block_type == MarkUpType.MONEY:
+        money.append( mrkp.attachments['Amount'])
+
         # print(mrkp.block_type, mrkp.text, mrkp.attachments)
 
 # Первым всегда идет заказчик
@@ -95,6 +100,9 @@ for cell in cells:
     new_cell = cell
     while '\n' in new_cell or '  ' in new_cell :
         new_cell = str(new_cell).replace('\n', '  ').replace('  ', ' ').strip()
+    for mrkp in text_mark_up.get_markup(text=new_cell):
+        if mrkp.block_type == MarkUpType.MONEY:
+            money.append( mrkp.attachments['Amount'])
     if 'заказчик' in new_cell.lower():
         for mrkp in text_mark_up.get_markup(text=new_cell):
             if mrkp.block_type == MarkUpType.INN:
@@ -138,11 +146,8 @@ for cell in cells:
                 context['executor_payment_account'] = mrkp.text.replace('р/с', '').strip()
             if mrkp.block_type == MarkUpType.INDEX:
                 context['executor_company_index'] = mrkp.text.replace('к/с', '').strip()
+context['contract_summ'] = sorted(money, reverse=True)[0]
 
-            print(mrkp.block_type, mrkp.text, new_cell)
-    # print('cell=', new_cell)
-
-print(context)
 
 # Читаем шаблон
 doc_gen = DocumentGenerator("docworker/templates/Дополнительное_соглашение_к_договору_поставки (Шаблон).docx")
