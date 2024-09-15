@@ -71,11 +71,6 @@ class TextMarkUp:
         text_markup = self.rebuild_markup(self.get_okpo_markup(text_markup=text_markup))
         text_markup = self.rebuild_markup(self.get_oktmo_markup(text_markup=text_markup))
         text_markup = self.rebuild_markup(self.get_okato_markup(text_markup=text_markup))
-
-        text_markup = self.rebuild_markup(self.get_rs_markup(text_markup=text_markup))
-        text_markup = self.rebuild_markup(self.get_ls_markup(text_markup=text_markup))
-        text_markup = self.rebuild_markup(self.get_index_markup(text_markup=text_markup))
-
         text_markup = self.rebuild_markup(self.get_bic_markup(text_markup=text_markup))
         text_markup = self.rebuild_markup(self.get_phone_markup(text_markup=text_markup))
         text_markup = self.rebuild_markup(self.get_snils_markup(text_markup=text_markup))
@@ -84,6 +79,9 @@ class TextMarkUp:
         text_markup = self.rebuild_markup(self.get_date_markup(text_markup=text_markup))
         text_markup = self.rebuild_markup(self.get_money_markup(text_markup=text_markup))
         text_markup = self.rebuild_markup(self.get_name_markup(text_markup=text_markup))
+        text_markup = self.rebuild_markup(self.get_rs_markup(text_markup=text_markup))
+        text_markup = self.rebuild_markup(self.get_ls_markup(text_markup=text_markup))
+        text_markup = self.rebuild_markup(self.get_index_markup(text_markup=text_markup))
         return self.rebuild_markup(text_markup=text_markup, delete_empty=True, join_similar=True)
 
     def get_bert_markup(self, text: str, start_index: int = 0) -> List[MarkUpBlock]:
@@ -112,48 +110,6 @@ class TextMarkUp:
             start_index += len(gap) + len(tok)
             last_block_type = block_type
         return text_markup
-
-    # def get_natasha_markup(self, text: str, start_index: int = 0) -> List[MarkUpBlock]:
-    #     """
-    #     :param text: The text which we need to markup.
-    #     :return: List[MarkUpBlock]
-    #     """
-    #     import spacy
-    #     from spacy import displacy
-    #     # python -m spacy download ru_core_news_md
-    #
-    #     ru_model = spacy.load("ru_core_news_md")
-    #     doc = ru_model(text)
-    #
-    #     for ent in doc.ents:
-    #         print(ent.text, ent.start_char, ent.end_char, ent.label_)
-    #
-    #     quit()
-    #     last_block_type = None
-    #     text_markup = []
-    #
-    #     for span in doc.spans:  # Перебираем сущности, как и в get_bert_markup
-    #         span_text = text[span.start: span.stop]
-    #         block_type = MarkUpType(span.tag)
-    #         gap = text[:span.start]
-    #
-    #         # Логика добавления нового блока или объединения с предыдущим
-    #         if span.tag == 'O' or (
-    #                 block_type != last_block_type and (len(text_markup) == 0 or not span.tag.startswith('I-'))):
-    #             text_markup.append(MarkUpBlock(
-    #                 text=(gap + span_text).strip(),
-    #                 block_type=block_type,
-    #                 start=start_index,
-    #                 end=start_index + len(gap) + len(span_text)
-    #             ))
-    #         else:
-    #             text_markup[-1].text += gap + span_text
-    #             text_markup[-1].text = text_markup[-1].text.strip()
-    #             text_markup[-1].end += len(gap) + len(span_text)
-    #
-    #         start_index += len(gap) + len(span_text)
-    #         last_block_type = block_type
-    #     return text_markup
 
     def get_name_markup(self, text_markup: List[MarkUpBlock]) -> List[MarkUpBlock]:
         """
@@ -698,7 +654,7 @@ class TextMarkUp:
         result_markup = []
         for tm in range(len(text_markup)):
             if text_markup[tm].block_type == MarkUpType.NOTHING:
-                rss = TextMarkUp._RS_extractor(text_markup[tm].text)
+                rss = TextMarkUp._LS_extractor(text_markup[tm].text)
                 increment = text_markup[tm].start
                 left_bounce = 0
                 for ls in rss:
@@ -1141,7 +1097,7 @@ class TextMarkUp:
         БИКXXXXXXXXXX
         """
         left_bounce = 0
-        re_LS = '(л/с).?.?\d{20}(\s|\D)?'
+        re_LS = '(к/с).?.?\d{20}(\s|\D)?'
         text = f"{text} "
         while re.search(re_LS, text, re.IGNORECASE) is not None:
             LS = re.search(re_LS, text, re.IGNORECASE)

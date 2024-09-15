@@ -1,10 +1,10 @@
 import time
 
-from models import YaGPT
-from tqdm import tqdm
-
-yagpt = YaGPT(catalog_id='b1gaa0i749eqe9ogone8', api_key='AQVN2yvuhm5p2BeZDjf-wj-k0qC1sHRVoZUYM_r3')
-yagpt.set_context(context='Ты юрист и эксперт по тендерам, в особенности по тендерам и 44-ФЗ')
+# from models import YaGPT
+# from tqdm import tqdm
+#
+# yagpt = YaGPT(catalog_id='b1gaa0i749eqe9ogone8', api_key='AQVN2yvuhm5p2BeZDjf-wj-k0qC1sHRVoZUYM_r3')
+# yagpt.set_context(context='Ты юрист и эксперт по тендерам, в особенности по тендерам и 44-ФЗ')
 # yagpt.set_context(context='Ты бизнесмен изанимаешься, а возможно только хочешь заниматься тендерами, по 44-ФЗ')
 #
 # lines = []
