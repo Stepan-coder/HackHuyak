@@ -47,6 +47,14 @@ context = {
     'executor_company_fullname': '',
     'executor_FIO': '',
 
+
+    'detail_paragraph': '',
+    'detail_text': '',
+    'except_paragraph': '',
+    'additional_paragraph': '',
+    'additional_text': '',
+    'metadata': '',
+
     'customer_company_index': '66666',
     'customer_company_adress': 'Усть залупинск',
     'customer_copany_INN': '3485734958732',

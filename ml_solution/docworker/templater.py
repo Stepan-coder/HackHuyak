@@ -38,10 +38,29 @@ class DocumentGenerator:
         if output_dir and not os.path.exists(output_dir):
             raise FileNotFoundError(f"Directory not found: {output_dir}")
 
+        texts = []
+        if context['detail_paragraph'] != '' and context['detail_paragraph'] != '':
+            texts.append(f"Стороны пришли к взаимному согласию об изложении пункта {context['detail_paragraph']} "
+                         f"в следующей редакции: {context['detail_paragraph']}.\n")
+
+        if context['except_paragraph'] != '':
+            texts.append(f"Стороны пришли к взаимному согласию об исключении пункта {context['except_paragraph']} из Договора.\n")
+
+        if context['additional_paragraph'] != '' and context['additional_text'] != '':
+            texts.append(f"Стороны пришли к взаимному согласию о добавлении пункта {context['additional_paragraph']} в "
+                         f"Договор в следующей редакции: {context['additional_text']}")
+
+        texts.append("Во всем остальном, что не предусмотрено настоящим Соглашением, Стороны руководствуются условиями Договора и дополнительными соглашениями к нему.")
+        texts.append("Настоящее Соглашение составлено в двух экземплярах, имеющих одинаковую юридическую силу, по одному экземпляру для каждой Стороны.")
+
+        buidet_text = ""
+        for i, text in enumerate(texts):
+            buidet_text += f"{i + 1}.  {text}"
+
+        context['metadata'] = buidet_text
+
         self.template.render(context)
         self.template.save(output_path)
-
-
 
 # # # Протокол разногласий (ОСНОВНОЕ)
 # context = {
