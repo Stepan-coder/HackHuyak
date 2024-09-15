@@ -31,7 +31,7 @@ class AgreementReadDetailSchema(BaseModel):
     specification_id: int
     specification: Optional['SpecificationReadSchema'] = None
 
-    document_name: str
+    document_file: str
 
     created: bool
     created_date: bool
@@ -41,7 +41,7 @@ class AgreementReadSchema(BaseModel):
     id: int
     contract_id: int
 
-    document_name: str
+    document_file: str
     created: bool
     created_date: datetime
 
@@ -52,7 +52,7 @@ class AgreementReadSchema(BaseModel):
 
 class AgreementCreateSchema(BaseModel):
     contract_id: int
-    document_name: str
+    document_file: str
 
     class Config:
         from_attributes = True

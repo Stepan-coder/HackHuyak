@@ -97,12 +97,11 @@ class Agreement(Base):
     specification: Mapped[Optional['Specification']] = relationship('Specification',
                                                                     back_populates='agreement', lazy='selectin')
 
-    chat_id: Mapped[int] = Column(Integer, ForeignKey('chat.id'), nullable=True)
-    chat: Mapped[Optional['Chat']] = relationship('Chat', back_populates='agreements',
-                                                          lazy='selectin')
+    # chat_id: Mapped[int] = Column(Integer, ForeignKey('chat.id'), nullable=True)
+    # chat: Mapped[Optional['Chat']] = relationship('Chat', back_populates='agreements',
+    #                                                       lazy='selectin')
 
-    document_name: Mapped[str] = Column(String, nullable=False)
-    document_content = Column(LargeBinary, nullable=False)
+    document_file: Mapped[str] = Column(String, nullable=True)
 
     created: Mapped[bool] = Column(Boolean, default=False)
     created_date: Mapped[datetime] = Column(DATE, default=datetime.now)
@@ -140,8 +139,8 @@ class Chat(Base):
     user_id: Mapped[int] = Column(Integer, ForeignKey('user.id'), nullable=True)
     user: Mapped[Optional['User']] = relationship('User', uselist=False)
 
-    agreements: Mapped[Optional[List['Agreement']]] = relationship('Agreement',
-                                                                   back_populates='chat', lazy='selectin')
+    # agreements: Mapped[Optional[List['Agreement']]] = relationship('Agreement',
+    #                                                                back_populates='chat', lazy='selectin')
 
     def __str__(self):
         return self.id

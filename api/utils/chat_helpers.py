@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from typing import List
 
 html = """
 <!DOCTYPE html>
@@ -86,3 +86,8 @@ async def save_message_history(data, current_msg_id, from_who,
         await session.refresh(chat)
 
         return chat.messages_history
+
+
+details = {'company_INN': 'ИНН', 'company_OGRN': 'ОГРН', 'company_KPP': 'КПП', 'company_adress': 'адрес',
+           'company_index': 'индекс', 'company_fullname': 'Юридическое имя', 'bank': 'Банк', 'BIC': 'БИК', 'payment_account': 'Р/С',
+           'correspondent_account': 'К/С'}

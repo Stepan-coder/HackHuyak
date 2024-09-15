@@ -8,9 +8,16 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from typer.cli import state
 
+from typing import List
+from docworker.docreader import read_docx_in_paragraphs, read_table_in_paragraphs
+from user_qa import get_answer
+from NER import *
+from docworker.templater import DocumentGenerator
+
+
 from api.database import get_async_session, database
 from api.schemas.contract_schemas import ChatReadSchema
-from api.utils.chat_helpers import html as ws_html, save_message_history
+from api.utils.chat_helpers import html as ws_html, save_message_history, details
 from api.utils.fsm_new import graph
 
 from api.utils.fsm_new import first_btn, second_btn
@@ -72,9 +79,12 @@ async def agreement_chat(websocket: WebSocket, user_id: int = None, session: Asy
 
     current_msg_id += 1
     current_contract = None
+
     start_msg = eval(graph.get_node(1).attachment)
+
     await save_message_history(start_msg, current_msg_id, 'system',
                                chat, session)
+
     await websocket.send_json(start_msg)
 
     while True:
@@ -94,11 +104,17 @@ async def agreement_chat(websocket: WebSocket, user_id: int = None, session: Asy
 
                     if contract:
                         current_contract = contract
+                        paragraphs = read_docx_in_paragraphs(current_contract.document_file)
+                        cells = read_table_in_paragraphs(current_contract.document_file)
+
+                        for field, name in details:
+                            contract_new[f'customer_{field}'] = get_answer(name, paragraphs)
+
+                            contract_new[f'supplier_{field}'] = get_answer(name, paragraphs,)
 
                     else:
                         await websocket.send_json(state_attachment)
                         continue
-
 
                 contract_new[state_attachment['field']] = data[1:]
 
@@ -128,5 +144,7 @@ async def agreement_chat(websocket: WebSocket, user_id: int = None, session: Asy
                                        chat, session)
 
             await websocket.send_json(system_msg)
+
+    DocumentGenerator.generate_document()
 
     await websocket.send_json(contract_new)
