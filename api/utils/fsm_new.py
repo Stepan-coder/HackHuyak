@@ -14,7 +14,7 @@ graph = Graph()
 
 graph.add_node(Node(id=1, attachment="""{'text':  'Вы можете заключить доп соглашение воспользовавшись нашим функционалом:',
                                        'buttons': [
-                                           {'to': 2, 'text': 'Создать доп соглашение', 'color': first_btn},
+                                           {'to': '*2', 'text': 'Создать доп соглашение', 'color': first_btn},
                                        ], 'type': 'form',
                                        'field': None
                                        }"""))
@@ -30,17 +30,17 @@ graph.add_node(Node(id=2, attachment="""{'text':  'Напишите номер �
 
 graph.add_node(Node(id=3, attachment="""{'text': 'Выберите действие с договором:',
                                       'buttons': [
-                                          {'to': 4, 'text': 'Изменить пункты договора', 'color': first_btn},
-                                          {'to': 14, 'text': 'Изменить реквизиты договора', 'color': first_btn},
-                                          {'to': 38, 'text': 'Завершить редактирование договора', 'color': first_btn}
+                                          {'to': '*4', 'text': 'Изменить пункты договора', 'color': first_btn},
+                                          {'to': '*14', 'text': 'Изменить реквизиты договора', 'color': first_btn},
+                                          {'to': '*38', 'text': 'Завершить редактирование договора', 'color': first_btn}
                                       ], 'type': 'form'}"""))
 
 graph.add_node(Node(id=4, attachment="""{'text': 'Выберите действия с пунктами договора:',
                                       'buttons': [
-                                          {'to': 8, 'text': 'Изложение пункта', 'color': first_btn},
-                                          {'to': 10, 'text': 'Исключение пункта', 'color': second_btn},
-                                          {'to': 11, 'text': 'Добавление пункта', 'color': first_btn},
-                                          {'to': 3, 'text': 'Назад', 'color': second_btn}
+                                          {'to': '*8', 'text': 'Изложение пункта', 'color': first_btn},
+                                          {'to': '*10', 'text': 'Исключение пункта', 'color': second_btn},
+                                          {'to': '*11', 'text': 'Добавление пункта', 'color': first_btn},
+                                          {'to': '*3', 'text': 'Назад', 'color': second_btn}
                                       ], 'type': 'form'}"""))
 
 # Изменение пунктов договора
@@ -51,14 +51,14 @@ graph.add_node(Node(id=8, attachment="""{'text': 'Напишите назван�
 
 graph.add_node(Node(id=9, attachment="""{'text': 'Напишите редакцию, которую вы хотите изменить :',
                                       'type': 'input', 'buttons': [], 'field': 'detail_text',
-                                      'placeholder': 'Введите текст редакции', 'main_to': 4}"""))
+                                      'placeholder': 'Введите текст редакции', 'main_to': '*4'}"""))
 
 
 # Исключение пунктов договора
 
 graph.add_node(Node(id=10, attachment="""{'text': 'Напишите название пункта, который вы хотите исключить:',
                                       'type': 'input', 'buttons': [], 'field': 'except_paragraph',
-                                      'placeholder': 'Введите название пункта', 'main_to': 4}"""))
+                                      'placeholder': 'Введите название пункта', 'main_to': '*4'}"""))
 
 # Добавление пункта договора
 
@@ -68,32 +68,32 @@ graph.add_node(Node(id=11, attachment="""{'text': 'Напишите назван
 
 graph.add_node(Node(id=12, attachment="""{'text': 'Напишите редакцию, в которой вы хотите добавить пункт:',
                                       'type': 'input', 'buttons': [], 'field': 'additional_text',
-                                      'placeholder': 'Введите текст редакции', 'main_to': 4}"""))
+                                      'placeholder': 'Введите текст редакции', 'main_to': '*4'}"""))
 
 # Редактирование реквизитов сторон
 
 graph.add_node(Node(id=14, attachment="""{'text': 'Выберите сторону договора, реквизиты которой нужно изменить:',
                                       'buttons': [
-                                          {'to': 15, 'text': 'Заказчик', 'color': first_btn},
-                                          {'to': 16, 'text': 'Поставщик', 'color': second_btn},
-                                          {'to': 3, 'text': 'Назад', 'color': second_btn}
+                                          {'to': '*15', 'text': 'Заказчик', 'color': first_btn},
+                                          {'to': '*16', 'text': 'Поставщик', 'color': second_btn},
+                                          {'to': '*3', 'text': 'Назад', 'color': second_btn}
                                       ], 'type': 'form'}"""))
 
 # Заказчик
 
 graph.add_node(Node(id=15, attachment="""{'text': 'Выберите реквизиты заказчика, которые вы хотели бы изменить:',
                                        'buttons': [
-                                           {'to': 17, 'text': 'ИНН', 'color': first_btn},
-                                           {'to': 18, 'text': 'ОГРН', 'color': second_btn},
-                                           {'to': 19, 'text': 'КПП', 'color': first_btn},
-                                           {'to': 20, 'text': 'Юридический адрес', 'color': second_btn},
-                                           {'to': 21, 'text': 'Юридический индекс', 'color': first_btn},
-                                           {'to': 22, 'text': 'Юридическое имя', 'color': second_btn},
-                                           {'to': 23, 'text': 'Банк', 'color': first_btn},
-                                           {'to': 24, 'text': 'БИК', 'color': second_btn},
-                                           {'to': 25, 'text': 'Р/С', 'color': first_btn},
-                                           {'to': 26, 'text': 'К/С', 'color': second_btn},
-                                           {'to': 3, 'text': 'Назад', 'color': second_btn}
+                                           {'to': '*17', 'text': 'ИНН', 'color': first_btn},
+                                           {'to': '*18', 'text': 'ОГРН', 'color': second_btn},
+                                           {'to': '*19', 'text': 'КПП', 'color': first_btn},
+                                           {'to': '*20', 'text': 'Юридический адрес', 'color': second_btn},
+                                           {'to': '*21', 'text': 'Юридический индекс', 'color': first_btn},
+                                           {'to': '*22', 'text': 'Юридическое имя', 'color': second_btn},
+                                           {'to': '*23', 'text': 'Банк', 'color': first_btn},
+                                           {'to': '*24', 'text': 'БИК', 'color': second_btn},
+                                           {'to': '*25', 'text': 'Р/С', 'color': first_btn},
+                                           {'to': '*26', 'text': 'К/С', 'color': second_btn},
+                                           {'to': '*3', 'text': 'Назад', 'color': second_btn}
                                        ], 'type': 'form'}"""))
 
 details = {'company_INN': 'ИНН', 'company_OGRN': 'ОГРН', 'company_KPP': 'КПП', 'company_adress': 'адрес',
@@ -105,7 +105,7 @@ for i, field, name in zip(range(17, 27), list(details.keys()), list(details.valu
     attachment = {'text': f'Напишите {name} заказчика',
                                            'buttons': [], 'type': 'input',
                                            'field': f'customer_{field}', 'placeholder': f'Введите {name} заказчика',
-                                           'main_to': 15}
+                                           'main_to': '*15'}
     graph.add_node(Node(id=i, attachment=f"""{attachment}"""))
 
 
@@ -114,17 +114,17 @@ for i, field, name in zip(range(17, 27), list(details.keys()), list(details.valu
 
 graph.add_node(Node(id=16, attachment="""{'text': 'Выберите реквизиты заказчика, которые вы хотели бы изменить:',
                                        'buttons': [
-                                           {'to': 27, 'text': 'ИНН', 'color': first_btn},
-                                           {'to': 28, 'text': 'ОГРН', 'color': second_btn},
-                                           {'to': 29, 'text': 'КПП', 'color': first_btn},
-                                           {'to': 30, 'text': 'Юридический адрес', 'color': second_btn},
-                                           {'to': 31, 'text': 'Юридический индекс', 'color': first_btn},
-                                           {'to': 32, 'text': 'Юридическое имя заказчика', 'color': second_btn},
-                                           {'to': 33, 'text': 'Банк', 'color': first_btn},
-                                           {'to': 34, 'text': 'БИК', 'color': second_btn},
-                                           {'to': 35, 'text': 'Р/С', 'color': first_btn},
-                                           {'to': 36, 'text': 'К/С', 'color': second_btn},
-                                           {'to': 3, 'text': 'Назад', 'color': second_btn}
+                                           {'to': '*27', 'text': 'ИНН', 'color': first_btn},
+                                           {'to': '*28', 'text': 'ОГРН', 'color': second_btn},
+                                           {'to': '*29', 'text': 'КПП', 'color': first_btn},
+                                           {'to': '*30', 'text': 'Юридический адрес', 'color': second_btn},
+                                           {'to': '*31', 'text': 'Юридический индекс', 'color': first_btn},
+                                           {'to': '*32', 'text': 'Юридическое имя заказчика', 'color': second_btn},
+                                           {'to': '*33', 'text': 'Банк', 'color': first_btn},
+                                           {'to': '*34', 'text': 'БИК', 'color': second_btn},
+                                           {'to': '*35', 'text': 'Р/С', 'color': first_btn},
+                                           {'to': '*36', 'text': 'К/С', 'color': second_btn},
+                                           {'to': '*3', 'text': 'Назад', 'color': second_btn}
                                        ], 'type': 'form'}"""))
 
 
@@ -132,14 +132,14 @@ for i, field, name in zip(range(27, 37), list(details.keys()), list(details.valu
     attachment = {'text': f'Напишите {name} поставщика',
                                            'buttons': [], 'type': 'input',
                                            'field': f'supplier_{field}', 'placeholder': f'Введите {name} поставщика',
-                                           'main_to': 16}
+                                           'main_to': '*16'}
     graph.add_node(Node(id=i, attachment=f"""{attachment}"""))
 
 
 graph.add_node(Node(id=37, attachment="""{'text': 'Это всё что вы хотели отредактировать?',
                                        'buttons': [
-                                           {'to': 38, 'text': 'Да', 'color': first_btn},
-                                           {'to': 3, 'text': 'Нет', 'color': second_btn}
+                                           {'to': '*38', 'text': 'Да', 'color': first_btn},
+                                           {'to': '*3', 'text': 'Нет', 'color': second_btn}
                                        ], 'type': 'form'}"""))
 
 graph.add_node(Node(id=38, attachment="""{'type': 'save'}"""))

@@ -71,48 +71,52 @@ async def agreement_chat(websocket: WebSocket, user_id: int = None, session: Asy
                 break
 
     current_msg_id += 1
+    current_contract = None
     start_msg = eval(graph.get_node(1).attachment)
     await save_message_history(start_msg, current_msg_id, 'system',
                                chat, session)
     await websocket.send_json(start_msg)
 
-    contract = None
-
     while True:
         data = await websocket.receive_text()
 
         if data:
+            if not data.startswith('*'):
+                await websocket.send_json('Промежуточный вопрос')
+                continue
+
             state_attachment = eval(current_state.attachment)
 
             if state_attachment['type'] == 'input':
                 if state_attachment['field'] == 'contract_number':
-                    contract_query = await session.execute(select(Contract).filter(Contract.number == data))
-                    contracts = contract_query.scalars()
+                    contract_query = await session.execute(select(Contract).filter(Contract.number == data[1:]))
+                    contract = contract_query.scalars().first()
 
-                    if len(contracts.all()) == 0:
+                    if contract:
+                        current_contract = contract
+
+                    else:
                         await websocket.send_json(state_attachment)
                         continue
 
-                    else:
-                        contract = contracts.first()
 
-                contract_new[state_attachment['field']] = data
+                contract_new[state_attachment['field']] = data[1:]
 
                 if 'main_to' in list(state_attachment.keys()):
-                    current_state = graph.get_node(state_attachment['main_to'])
+                    current_state = graph.get_node(int(state_attachment['main_to'][1:]))
 
                 else:
                     current_state = graph.get_node(list(graph.predict(current_state.id).values())[0])
 
             elif state_attachment['type'] == 'form':
-                current_state = graph.get_node(int(data))
+                current_state = graph.get_node(int(data[1:]))
 
                 if eval(current_state.attachment)['type'] == 'save':
-                    # contract.contract_content = contract_new
-                    # session.add(contract)
-                    #
-                    # await session.commit()
-                    # await session.refresh(contract)
+                    current_contract.contract_content = contract_new
+                    session.add(current_contract)
+
+                    await session.commit()
+                    await session.refresh(current_contract)
 
                     break
 

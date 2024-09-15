@@ -19,13 +19,13 @@ from api.router_global import router
 def create_app() -> FastAPI:
     docs_url = '/docs' if not config_parameters.IS_PROD else None
     redoc_url = '/redoc' if not config_parameters.IS_PROD else None
-    app = FastAPI(title='Shedevro.API', debug=not config_parameters.IS_PROD,
+    app = FastAPI(title='Acmenra.API', debug=not config_parameters.IS_PROD,
                   docs_url=docs_url, redoc_url=redoc_url,
                   root_path='/api',)
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=["http://localhost:3000", "https://tender-hack.vercel.app/"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
